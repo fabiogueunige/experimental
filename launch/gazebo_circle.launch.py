@@ -40,14 +40,13 @@ def generate_launch_description():
         #             {'camera_info_topic': '/camera/camera_info'}],
         # output='screen'
     )
-    """
+
     robot_rotation_node = Node(
         package='robot_urdf',
         executable='robot_rotation',
         name='robot_rotation',
         output='screen'
     )
-    """
 
     marker_sub_node = Node(
         package='robot_urdf',
@@ -68,7 +67,7 @@ def generate_launch_description():
         robot_state_publisher_node,
         joint_state_publisher_node,
         aruco_node,
-        #robot_rotation_node,
+        robot_rotation_node,
         marker_sub_node,
         spawn_entity,
         

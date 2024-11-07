@@ -2,7 +2,7 @@
 """
 import rclpy
 from rclpy.node import Node
-from robot_urdf.scripts.marker_sub import MarkerClass_Subscriber
+from robot_urdf.robot_urdf.marker_sub import MarkerClass_Subscriber
 import numpy as np
 from geometry_msgs.msg import PoseArray, Twist
 from ros2_aruco_interfaces.msg import ArucoMarkers
@@ -11,7 +11,7 @@ cmd_pub = None
 
 class cmd_publisher(Node):
     def __init__(self):
-        super().__init__('cmd_publisher')
+        super().__init__('robot_rotation')
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 1)
 
     def send_cmd(self, linear, angular):
