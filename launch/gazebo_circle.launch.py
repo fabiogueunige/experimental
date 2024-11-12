@@ -33,14 +33,14 @@ def generate_launch_description():
     aruco_node = Node(
         package='ros2_aruco',
         executable='aruco_node',
-        name='aruco_node'
-        # parameters=[{'marker_size': 0.0625},
-        #             {'aruco_dictionary_id': 'DICT_5X5_250'},
-        #             {'image_topic': '/camera/image_raw'},  !! cambia to compressed!!
-        #             {'camera_info_topic': '/camera/camera_info'}],
-        # output='screen'
+        name='aruco_node',
+        parameters=[{'marker_size': 0.0625},
+                    {'aruco_dictionary_id': 'DICT_5X5_250'},
+                    {'image_topic': '/camera/image_raw'},  # !! cambia to compressed!!
+                    {'camera_info_topic': '/camera/camera_info'}],
+        output='screen'
     )
-
+    
     robot_rotation_node = Node(
         package='robot_urdf',
         executable='robot_rotation',

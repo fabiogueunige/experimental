@@ -13,6 +13,12 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*launch.py')),
+        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.xacro')),
+        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.gazebo')),
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.world')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.rviz')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,8 +29,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'robot_rotation_node = robot_urdf.robot_rotation_node:main',
-            'marker_sub_node = robot_urdf.marker_sub_node:main'
+            'robot_rotation = robot_urdf.robot_rotation:main',
+            'marker_sub = robot_urdf.marker_sub:main'
         ],
     },
 )

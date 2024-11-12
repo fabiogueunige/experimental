@@ -12,6 +12,7 @@ from ros2_aruco_interfaces.msg import ArucoMarkers
 class MarkerClass_Subscriber (Node):
     def __init__(self):
         super().__init__('marker_sub')
+        self.aruco_marker = None
         self.subscription_marker = self.create_subscription(
             ArucoMarkers,
             'aruco_markers',

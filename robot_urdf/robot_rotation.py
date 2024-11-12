@@ -2,7 +2,7 @@
 """
 import rclpy
 from rclpy.node import Node
-from robot_urdf.robot_urdf.marker_sub import MarkerClass_Subscriber
+from robot_urdf.marker_sub import MarkerClass_Subscriber
 import numpy as np
 from geometry_msgs.msg import PoseArray, Twist
 from ros2_aruco_interfaces.msg import ArucoMarkers
@@ -29,6 +29,7 @@ def robot_control():
         if marker.aruco_marker is not None:
             print(marker.aruco_marker)
             if marker.aruco_marker.marker_ids [0] == marker.aruco_marker.marker_ids [-1]:
+                # if len(marker.aruco_marker) > 1:
                 if marker.aruco_marker.poses[0] == marker.aruco_marker.poses[-1]:
                     marker.aruco_marker.marker_ids.pop()
                     marker.aruco_marker.poses.pop()
