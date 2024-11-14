@@ -25,7 +25,7 @@ class CmdPublisher(Node):
 def robot_control(cmd_pub):
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.3
+    angular = 1.0
 
     detected_markers = []
 
@@ -36,7 +36,7 @@ def robot_control(cmd_pub):
             continue
         else:
             if marker.aruco_marker.marker_ids[-1] not in detected_markers.marker_ids:
-                cmd_pub.get_logger().info(f'Detected marker ID: {marker.aruco_marker.marker_ids[-1]}')
+                cmd_pub.get_logger().info(f'marker ID: {marker.aruco_marker.marker_ids[-1]}')
                 detected_markers.marker_ids.append(marker.aruco_marker.marker_ids[-1])
                 detected_markers.poses.append(marker.aruco_marker.poses[-1])
                     
