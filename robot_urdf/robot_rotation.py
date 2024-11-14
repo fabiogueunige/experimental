@@ -1,5 +1,8 @@
-"""
-"""
+#  NON SERVE PIÙ, SI PUO FARE UN MARKER SUB CHE VIENE MEGLIO
+# E POI UN MARKER PUB CHE PUBBLICA IL MARKER CHE SI VUOLE RAGGIUNGERE
+# E INFINE UN CONTROLLORE CHE SI MUOVE VERSO IL MARKER PUBBLICATO
+
+
 import rclpy
 from rclpy.node import Node
 from robot_urdf.marker_sub import MarkerClass_Subscriber
@@ -7,6 +10,7 @@ import numpy as np
 from geometry_msgs.msg import PoseArray, Twist
 from ros2_aruco_interfaces.msg import ArucoMarkers
 
+min_marker = 3
 class CmdPublisher(Node):
     def __init__(self):
         super().__init__('robot_rotation')
@@ -18,48 +22,31 @@ class CmdPublisher(Node):
         msg.angular.z = angular
         self.publisher_.publish(msg)
 
-"""
 def robot_control(cmd_pub):
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 1.0
+    angular = 0.3
 
-    detected_markers = {}
-    start_marker_id = None
-    start_marker_pose = None
+    detected_markers = []
 
     while rclpy.ok():
-        rclpy.spin_once(marker, timeout_sec=0.1)
-        if marker.aruco_marker is not None:
-            for i, marker_id in enumerate(marker.aruco_marker.marker_ids):
-                pose = marker.aruco_marker.poses[i]
-                if marker_id not in detected_markers:
-                    detected_markers[marker_id] = pose
-                    if start_marker_id is None:
-                        start_marker_id = marker_id
-                        start_marker_pose = pose
-                elif marker_id == start_marker_id and pose == start_marker_pose:
-                    print("Returned to the starting marker. Stopping.")
-                    cmd_pub.send_cmd(0.0, 0.0)
-                    return
-
-        cmd_pub.send_cmd(linear, angular)
-"""
-
-def robot_control(cmd_pub):
-    marker = MarkerClass_Subscriber()
-    linear = 0.0
-    angular = 1.0
-
-    while rclpy.ok():
-        if marker.aruco_marker is not None:
-            print(marker.aruco_marker)
-            if marker.aruco_marker.marker_ids [0] == marker.aruco_marker.marker_ids [-1]:
-                if len(marker.aruco_marker) > 1:
-                    if marker.aruco_marker.poses[0] == marker.aruco_marker.poses[-1]:
-                        marker.aruco_marker.marker_ids.pop()
-                        marker.aruco_marker.poses.pop()
-                        break
+        rclpy.spin_once(marker)
+        if marker.aruco_marker is None:
+            cmd_pub.get_logger().info('No marker detected yet')
+            continue
+        else:
+            if marker.aruco_marker.marker_ids[-1] not in detected_markers.marker_ids:
+                cmd_pub.get_logger().info(f'Detected marker ID: {marker.aruco_marker.marker_ids[-1]}')
+                detected_markers.marker_ids.append(marker.aruco_marker.marker_ids[-1])
+                detected_markers.poses.append(marker.aruco_marker.poses[-1])
+                    
+            else:
+                if len(detected_markers.marker_ids) >= min_marker:
+                    if detected_markers.marker_ids[0] == marker.aruco_marker.marker_ids[-1]:
+                        cmd_pub.get_logger().info("Returned to the starting marker. Stopping.")
+                        angular = 0.0
+                        cmd_pub.send_cmd(linear, angular)
+                        return
         
         cmd_pub.send_cmd(linear, angular)
 
@@ -72,7 +59,7 @@ def main():
 
     rclpy.spin(cmd_pub)
 
-    CmdPublisher.destroy_node()
+    cmd_pub.destroy_node()
     rclpy.shutdown()
 
 

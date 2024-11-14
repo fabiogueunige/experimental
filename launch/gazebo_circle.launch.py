@@ -34,11 +34,11 @@ def generate_launch_description():
         package='ros2_aruco',
         executable='aruco_node',
         name='aruco_node',
-        parameters=[{'marker_size': 0.0625},
-                    {'aruco_dictionary_id': 'DICT_5X5_250'},
-                    {'image_topic': '/camera/image_raw'},  # !! cambia to compressed!!
-                    {'camera_info_topic': '/camera/camera_info'}],
-        output='screen'
+        # parameters=[{'marker_size': 0.0625},
+        #             {'aruco_dictionary_id': 'DICT_5X5_250'},
+        #             {'image_topic': '/camera/image_raw'},  
+        #             {'camera_info_topic': '/camera/camera_info'}]
+        # output='screen'
     )
     
     robot_rotation_node = Node(
@@ -53,6 +53,13 @@ def generate_launch_description():
         executable='marker_sub',
         name='marker_sub'
     )
+    """
+    cmd_publisher_node = Node(
+        package='robot_urdf',
+        executable='cmd_publisher',
+        name='cmd_publisher'
+    )
+    """
 
 
     # GAZEBO_MODEL_PATH has to be correctly set for Gazebo to be able to find the model
@@ -69,6 +76,7 @@ def generate_launch_description():
         aruco_node,
         robot_rotation_node,
         marker_sub_node,
+        # cmd_publisher_node,
         spawn_entity,
         
         ExecuteProcess(

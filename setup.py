@@ -30,7 +30,8 @@ setup(
     entry_points={
         'console_scripts': [
             'robot_rotation = robot_urdf.robot_rotation:main',
-            'marker_sub = robot_urdf.marker_sub:main'
+            'marker_sub = robot_urdf.marker_sub:main',
+            # 'cmd_publisher = robot_urdf.cmd_publisher:main'
         ],
     },
 )

@@ -29,6 +29,7 @@ class MarkerClass_Subscriber (Node):
         """
 
     def aruco_marker_callback(self, msg_marker):
+        self.get_logger().info('Detected marker ID: {msg_marker.marker_ids[-1]}')
         self.aruco_marker = msg_marker
     """
     def pose_marker_callback(self, msg_pose):
