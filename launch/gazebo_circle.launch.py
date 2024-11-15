@@ -48,20 +48,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    marker_sub_node = Node(
-        package='robot_urdf',
-        executable='marker_sub',
-        name='marker_sub'
-    )
-    """
-    cmd_publisher_node = Node(
-        package='robot_urdf',
-        executable='cmd_publisher',
-        name='cmd_publisher'
-    )
-    """
-
-
+    
     # GAZEBO_MODEL_PATH has to be correctly set for Gazebo to be able to find the model
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-entity', 'my_test_robot', '-topic', '/robot_description', '-Y', '3.14'],
@@ -75,8 +62,6 @@ def generate_launch_description():
         joint_state_publisher_node,
         aruco_node,
         robot_rotation_node,
-        marker_sub_node,
-        # cmd_publisher_node,
         spawn_entity,
         
         ExecuteProcess(
