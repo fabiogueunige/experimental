@@ -12,29 +12,36 @@ from ros2_aruco_interfaces.msg import ArucoMarkers
 class MarkerClass_Subscriber (Node):
     def __init__(self):
         super().__init__('marker_sub')
-        self.marker_id = 0
-        self.marker_pose = Pose()
         self.subscription_marker = self.create_subscription(
             ArucoMarkers,
             'aruco_markers',
             self.aruco_marker_callback,
             10)
         self.subscription_marker  # prevent unused variable warning
+        self.marker_id = 0
+        self.marker_pose = Pose()
+        self.min_marker = 3
+        self.detected_markers = ArucoMarkers() #list of all Aruco markers detected 
+        self.end_recognition = False           #flag to stop the robot when it returns to the starting marker
+        
 
     def aruco_marker_callback(self, msg_marker):
         self.marker_id = msg_marker.marker_ids[-1]
         self.marker_pose = msg_marker.poses[-1]
-        self.get_logger().info(f'Received message with marker {self.marker_id} and pose {self.marker_pose}')
+        self.robot_control ()
 
-
-def main ():
-    rclpy.init()
-    node = MarkerClass_Subscriber()
-    rclpy.spin(node)
-
-    node.destroy_node()
-    rclpy.shutdown()
-
-
-if __name__ == '__main__':
-    main()
+    def robot_control(self):
+        if not self.marker_id:
+            self.get_logger().info('No marker detected yet')
+            
+        else:
+            if self.marker_id not in self.detected_markers.marker_ids:
+                self.get_logger().info(f'marker ID: {self.marker_id}')
+                self.detected_markers.marker_ids.append(self.marker_id)
+                self.detected_markers.poses.append(self.marker_pose)
+                    
+            else:
+                if len(self.detected_markers.marker_ids) >= self.min_marker:
+                    if self.detected_markers.marker_ids[0] == self.marker_id:
+                        self.end_recognition = True
+        
