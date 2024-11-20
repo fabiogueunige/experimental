@@ -44,4 +44,14 @@ class MarkerClass_Subscriber (Node):
                 if len(self.detected_markers.marker_ids) >= self.min_marker:
                     if self.detected_markers.marker_ids[0] == self.marker_id:
                         self.end_recognition = True
+
+    def reorder(self):
+        # reorder the markers from the smaller id to the biggest one
+        combined = list(zip(self.detected_markers.marker_ids, self.detected_markers.poses))
+        combined_sorted = sorted(combined, key=lambda x: x[0])
+        self.detected_markers.marker_ids, self.detected_markers.poses = zip(*combined_sorted)
+        self.detected_markers.marker_ids = list(self.detected_markers.marker_ids)
+        self.detected_markers.poses = list(self.detected_markers.poses)
+        
+
         
