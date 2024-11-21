@@ -5,6 +5,8 @@ from ros2_aruco_interfaces.msg import ArucoMarkers
 import numpy as np
 from sensor_msgs.msg import Image
 from rclpy.qos import qos_profile_sensor_data
+from cv_bridge import CvBridge
+from std_msgs.msg import Int64MultiArray
 
 class MarkerClass_Subscriber (Node):
     def __init__(self):
@@ -30,6 +32,7 @@ class MarkerClass_Subscriber (Node):
         self.detected_markers = [] #list of all Aruco markers detected 
         self.end_recognition = False #flag to stop the robot when it returns to the starting marker
         
+        
 
     def aruco_marker_callback(self, msg_marker):
         self.marker_id = msg_marker.marker_ids[-1]
@@ -38,7 +41,6 @@ class MarkerClass_Subscriber (Node):
 
     def image_callback(self, msg_image):
         self.current_img = msg_image
-        self.get_logger().info('Received compressed image')
 
     def robot_control(self):
         if not self.marker_id:
@@ -46,7 +48,6 @@ class MarkerClass_Subscriber (Node):
             
         else:
             if self.marker_id not in [marker['id'] for marker in self.detected_markers]:
-                self.get_logger().info(f'marker ID: {self.marker_id}')
                 self.detected_markers.append({
                     'id': self.marker_id,
                     'pose': self.marker_pose,
