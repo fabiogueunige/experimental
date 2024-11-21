@@ -4,10 +4,11 @@ from robot_urdf.marker_sub import MarkerClass_Subscriber
 from robot_urdf.cmd_pub import CmdPublisher
 from geometry_msgs.msg import Twist
 from ros2_aruco_interfaces.msg import ArucoMarkers
+from sensor_msgs.msg import CameraInfo
+from sensor_msgs.msg import Image
 
 def main():
     rclpy.init()
-
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
@@ -30,7 +31,7 @@ def main():
             vel_pub.send_cmd(linear, angular)
 
         marker.reorder()
-        marker.get_logger().info(f' {marker.detected_markers.marker_ids}')
+        marker.get_logger().info(f'Detected markers: {[marker["id"] for marker in marker.detected_markers]}')
 
     except KeyboardInterrupt:
         print("Shutting down robot_control node.")

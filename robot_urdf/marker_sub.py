@@ -1,13 +1,10 @@
-"""
-Main assignment 1 node
-"""
-
 import rclpy
 from rclpy.node import Node
-import numpy as np
-from geometry_msgs.msg import PoseArray, Pose
+from geometry_msgs.msg import Pose
 from ros2_aruco_interfaces.msg import ArucoMarkers
-
+import numpy as np
+from sensor_msgs.msg import Image
+from rclpy.qos import qos_profile_sensor_data
 
 class MarkerClass_Subscriber (Node):
     def __init__(self):
@@ -18,11 +15,20 @@ class MarkerClass_Subscriber (Node):
             self.aruco_marker_callback,
             10)
         self.subscription_marker  # prevent unused variable warning
+        
+        self.subscription_image = self.create_subscription(
+            Image,
+            '/camera/image_raw',
+            self.image_callback,
+            qos_profile_sensor_data)
+        self.subscription_image  # prevent unused variable warning
+        self.current_img = None
+        
         self.marker_id = 0
         self.marker_pose = Pose()
         self.min_marker = 3
-        self.detected_markers = ArucoMarkers() #list of all Aruco markers detected 
-        self.end_recognition = False           #flag to stop the robot when it returns to the starting marker
+        self.detected_markers = [] #list of all Aruco markers detected 
+        self.end_recognition = False #flag to stop the robot when it returns to the starting marker
         
 
     def aruco_marker_callback(self, msg_marker):
@@ -30,28 +36,31 @@ class MarkerClass_Subscriber (Node):
         self.marker_pose = msg_marker.poses[-1]
         self.robot_control ()
 
+    def image_callback(self, msg_image):
+        self.current_img = msg_image
+        self.get_logger().info('Received compressed image')
+
     def robot_control(self):
         if not self.marker_id:
             self.get_logger().info('No marker detected yet')
             
         else:
-            if self.marker_id not in self.detected_markers.marker_ids:
+            if self.marker_id not in [marker['id'] for marker in self.detected_markers]:
                 self.get_logger().info(f'marker ID: {self.marker_id}')
-                self.detected_markers.marker_ids.append(self.marker_id)
-                self.detected_markers.poses.append(self.marker_pose)
+                self.detected_markers.append({
+                    'id': self.marker_id,
+                    'pose': self.marker_pose,
+                    'image': self.current_img
+                })
                     
             else:
-                if len(self.detected_markers.marker_ids) >= self.min_marker:
-                    if self.detected_markers.marker_ids[0] == self.marker_id:
+                if len(self.detected_markers) >= self.min_marker:
+                    if self.detected_markers[0]['id'] == self.marker_id:
                         self.end_recognition = True
 
     def reorder(self):
         # reorder the markers from the smaller id to the biggest one
-        combined = list(zip(self.detected_markers.marker_ids, self.detected_markers.poses))
-        combined_sorted = sorted(combined, key=lambda x: x[0])
-        self.detected_markers.marker_ids, self.detected_markers.poses = zip(*combined_sorted)
-        self.detected_markers.marker_ids = list(self.detected_markers.marker_ids)
-        self.detected_markers.poses = list(self.detected_markers.poses)
+        self.detected_markers.sort(key=lambda x: x['id'])
         
 
         
