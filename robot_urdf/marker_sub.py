@@ -6,7 +6,7 @@ import numpy as np
 from sensor_msgs.msg import Image
 from rclpy.qos import qos_profile_sensor_data
 from cv_bridge import CvBridge
-from std_msgs.msg import Int64MultiArray
+
 
 class MarkerClass_Subscriber (Node):
     def __init__(self):
@@ -26,13 +26,26 @@ class MarkerClass_Subscriber (Node):
         self.subscription_image  # prevent unused variable warning
         self.current_img = None
         
+        """
+        self.subscription_corners = self.create_subscription(
+            Pose,
+            'aruco_corners',
+            self.corners_callback,
+            10)
+        self.subscription_corners
+        self.center = Pose()
+        """
+
         self.marker_id = 0
         self.marker_pose = Pose()
         self.min_marker = 3
         self.detected_markers = [] #list of all Aruco markers detected 
         self.end_recognition = False #flag to stop the robot when it returns to the starting marker
-        
-        
+
+    """    
+    def corners_callback(self, msg_corners):   
+        self.center = msg_corners
+        """
 
     def aruco_marker_callback(self, msg_marker):
         self.marker_id = msg_marker.marker_ids[-1]
@@ -51,7 +64,8 @@ class MarkerClass_Subscriber (Node):
                 self.detected_markers.append({
                     'id': self.marker_id,
                     'pose': self.marker_pose,
-                    'image': self.current_img
+                    'image': self.current_img,
+                    # 'centers': self.center
                 })
                     
             else:

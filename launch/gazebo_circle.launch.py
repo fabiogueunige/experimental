@@ -35,7 +35,7 @@ def generate_launch_description():
         executable='aruco_node',
         name='aruco_node',
         # parameters=[{'marker_size': 0.0625},
-        #             {'aruco_dictionary_id': 'DICT_5X5_250'},
+        #             {'aruco_357.dictionary_id': 'DICT_5X5_250'},
         #             {'image_topic': '/camera/image_raw'},  
         #             {'camera_info_topic': '/camera/camera_info'}]
         # output='screen'

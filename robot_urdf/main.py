@@ -44,13 +44,15 @@ def main():
             except CvBridgeError as e:
                 print(e) 
 
-            # cv2.circle(cv_image, (mk['corners'][0][0], mk['corners'][0][1]), 5, (0, 0, 255), -1)
+        
+            # cv2.circle(cv_image, (mk['centers'][0], mk['centers'][1]), 5, (0, 0, 255), -1)
 
             cv2.imshow("Image window", cv_image)
-            cv2.waitKey(3)
+            cv2.waitKey(0)
 
             try:
                 img_pub.publish_image(bridge.cv2_to_imgmsg(cv_image, encoding='mono8'))
+                
 
             except CvBridgeError as e:
                 print(e) 
