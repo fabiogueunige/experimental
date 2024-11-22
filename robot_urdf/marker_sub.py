@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, PoseArray
 from ros2_aruco_interfaces.msg import ArucoMarkers
 import numpy as np
 from sensor_msgs.msg import Image
@@ -26,15 +26,13 @@ class MarkerClass_Subscriber (Node):
         self.subscription_image  # prevent unused variable warning
         self.current_img = None
         
-        """
         self.subscription_corners = self.create_subscription(
             Pose,
             'aruco_corners',
             self.corners_callback,
             10)
         self.subscription_corners
-        self.center = Pose()
-        """
+        self.center = None
 
         self.marker_id = 0
         self.marker_pose = Pose()
@@ -42,10 +40,9 @@ class MarkerClass_Subscriber (Node):
         self.detected_markers = [] #list of all Aruco markers detected 
         self.end_recognition = False #flag to stop the robot when it returns to the starting marker
 
-    """    
     def corners_callback(self, msg_corners):   
         self.center = msg_corners
-        """
+        self.get_logger().info('Center: %f %f %f' % (self.center.position.x, self.center.position.y, self.center.position.z))
 
     def aruco_marker_callback(self, msg_marker):
         self.marker_id = msg_marker.marker_ids[-1]
@@ -61,12 +58,13 @@ class MarkerClass_Subscriber (Node):
             
         else:
             if self.marker_id not in [marker['id'] for marker in self.detected_markers]:
-                self.detected_markers.append({
-                    'id': self.marker_id,
-                    'pose': self.marker_pose,
-                    'image': self.current_img,
-                    # 'centers': self.center
-                })
+                if self.center is not None:
+                    self.detected_markers.append({
+                        'id': self.marker_id,
+                        'pose': self.marker_pose,
+                        'image': self.current_img,
+                        'centers': self.center
+                    })                  
                     
             else:
                 if len(self.detected_markers) >= self.min_marker:

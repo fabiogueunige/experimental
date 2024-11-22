@@ -16,7 +16,7 @@ def main():
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.5
+    angular = 0.2
     bridge = CvBridge()
     img_pub = ImagePublisher()
 
@@ -44,9 +44,12 @@ def main():
             except CvBridgeError as e:
                 print(e) 
 
-        
-            # cv2.circle(cv_image, (mk['centers'][0], mk['centers'][1]), 5, (0, 0, 255), -1)
+            center_x = int(mk['centers'].position.x)
+            center_y = int(mk['centers'].position.y)
+            radius = int(mk['centers'].position.z)
 
+            cv2.circle(cv_image, (center_x, center_y), radius, (0, 255, 0), 2)
+            
             cv2.imshow("Image window", cv_image)
             cv2.waitKey(0)
 
