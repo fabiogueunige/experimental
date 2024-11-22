@@ -6,6 +6,7 @@ import numpy as np
 from sensor_msgs.msg import Image
 from rclpy.qos import qos_profile_sensor_data
 from cv_bridge import CvBridge
+import cv2
 
 
 class MarkerClass_Subscriber (Node):
@@ -34,6 +35,23 @@ class MarkerClass_Subscriber (Node):
         self.subscription_corners
         self.center = None
 
+        self.declare_parameter("aruco_dictionary_id", "DICT_ARUCO_ORIGINAL")
+        dictionary_id_name = self.get_parameter(
+            "aruco_dictionary_id").get_parameter_value().string_value
+        # Make sure we have a valid dictionary id:
+        try:
+            dictionary_id = cv2.aruco.__getattribute__(dictionary_id_name)
+            if type(dictionary_id) != type(cv2.aruco.DICT_5X5_100):
+                raise AttributeError
+        except AttributeError:
+            self.get_logger().error("bad aruco_dictionary_id: {}".format(dictionary_id_name))
+            options = "\n".join([s for s in dir(cv2.aruco) if s.startswith("DICT")])
+            self.get_logger().error("valid options: {}".format(options))
+
+        self.aruco_dictionary = cv2.aruco.Dictionary_get(dictionary_id)
+        self.aruco_parameters = cv2.aruco.DetectorParameters_create()
+        self.bridge = CvBridge()
+
         self.marker_id = 0
         self.marker_pose = Pose()
         self.min_marker = 3
@@ -59,12 +77,23 @@ class MarkerClass_Subscriber (Node):
         else:
             if self.marker_id not in [marker['id'] for marker in self.detected_markers]:
                 if self.center is not None:
+                    cv_image = self.bridge.imgmsg_to_cv2(self.current_img,
+                                             desired_encoding='mono8')
+                    corners, marker_ids, rejected = cv2.aruco.detectMarkers(cv_image,
+                                                                self.aruco_dictionary,
+                                                                parameters=self.aruco_parameters)
+                    pose_center = Pose()
+                    pose_center.position.x = (corners[0][0][0][0] + corners[0][0][2][0] + corners[0][0][3][0] + corners[0][0][1][0]) / 4
+                    pose_center.position.y = (corners[0][0][0][1] + corners[0][0][2][1] + corners[0][0][3][1] + corners[0][0][1][1]) / 4
+                    # on the z-axis we have the radius
+                    pose_center.position.z = np.sqrt((pose_center.position.x - corners[0][0][0][0]) ** 2 + (pose_center.position.y - corners[0][0][0][1]) ** 2)
                     self.detected_markers.append({
                         'id': self.marker_id,
                         'pose': self.marker_pose,
                         'image': self.current_img,
-                        'centers': self.center
-                    })                  
+                        'centers': pose_center
+                    })
+                
                     
             else:
                 if len(self.detected_markers) >= self.min_marker:

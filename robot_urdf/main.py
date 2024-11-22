@@ -16,7 +16,7 @@ def main():
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.2
+    angular = 0.5
     bridge = CvBridge()
     img_pub = ImagePublisher()
 
@@ -47,6 +47,8 @@ def main():
             center_x = int(mk['centers'].position.x)
             center_y = int(mk['centers'].position.y)
             radius = int(mk['centers'].position.z)
+            #center_x = int(mk['pose'].position.x)
+            #center_y = int(mk['pose'].position.y)
 
             cv2.circle(cv_image, (center_x, center_y), radius, (0, 255, 0), 2)
             
