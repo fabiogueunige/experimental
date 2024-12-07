@@ -25,6 +25,7 @@ class MarkerClass_Subscriber (Node):
             qos_profile_sensor_data)
         self.subscription_image  # prevent unused variable warning
         self.current_img = None
+        self.change_img = True
         
         self.subscription_corners = self.create_subscription(
             Pose,
@@ -40,22 +41,24 @@ class MarkerClass_Subscriber (Node):
         self.detected_markers = [] #list of all Aruco markers detected 
         self.end_recognition = False #flag to stop the robot when it returns to the starting marker
 
-    def corners_callback(self, msg_corners):   
+    def corners_callback(self, msg_corners):  
         self.center = msg_corners
-        self.get_logger().info('Center: %f %f %f' % (self.center.position.x, self.center.position.y, self.center.position.z))
+        # self.get_logger().info('Center: %f %f %f' % (self.center.position.x, self.center.position.y, self.center.position.z))
 
     def aruco_marker_callback(self, msg_marker):
         self.marker_id = msg_marker.marker_ids[-1]
         self.marker_pose = msg_marker.poses[-1]
-        self.robot_control ()
+        self.robot_control()
 
     def image_callback(self, msg_image):
-        self.current_img = msg_image
+        if self.change_img:
+            self.current_img = msg_image
+            self.change_img = False
 
     def robot_control(self):
         if not self.marker_id:
-            self.get_logger().info('No marker detected yet')
-            
+            self.change_img = True
+            self.get_logger().info('No marker')
         else:
             if self.marker_id not in [marker['id'] for marker in self.detected_markers]:
                 if self.center is not None:
@@ -64,16 +67,32 @@ class MarkerClass_Subscriber (Node):
                         'pose': self.marker_pose,
                         'image': self.current_img,
                         'centers': self.center
-                    })                  
-                    
+                    })  
+                    self.change_img = True
+                                
             else:
                 if len(self.detected_markers) >= self.min_marker:
                     if self.detected_markers[0]['id'] == self.marker_id:
                         self.end_recognition = True
+
+            self.change_img = True
 
     def reorder(self):
         # reorder the markers from the smaller id to the biggest one
         self.detected_markers.sort(key=lambda x: x['id'])
         
 
-        
+
+def main():
+    rclpy.init()
+    node = MarkerClass_Subscriber()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()        

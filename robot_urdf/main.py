@@ -16,7 +16,7 @@ def main():
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.2
+    angular = 0.6
     bridge = CvBridge()
     img_pub = ImagePublisher()
 
@@ -24,6 +24,7 @@ def main():
         while rclpy.ok():
             rclpy.spin_once(marker)
             if not marker.marker_id:
+                marker.change_img = True
                 marker.get_logger().info('No marker detected yet')
             
             if marker.end_recognition:
@@ -35,10 +36,7 @@ def main():
             vel_pub.send_cmd(linear, angular)
 
         marker.reorder()
-        for mk in marker.detected_markers:
-            #if isinstance(mk['image'], Image):
-            #        marker.get_logger().info('Image received')
-                
+        for mk in marker.detected_markers:   
             try: 
                 cv_image = bridge.imgmsg_to_cv2(mk['image'], desired_encoding='mono8')
             except CvBridgeError as e:
@@ -48,7 +46,7 @@ def main():
             center_y = int(mk['centers'].position.y)
             radius = int(mk['centers'].position.z)
 
-            cv2.circle(cv_image, (center_x, center_y), radius, (0, 255, 0), 2)
+            cv2.circle(cv_image, (center_x, center_y), radius, (0, 0, 255), 2)
             
             cv2.imshow("Image window", cv_image)
             cv2.waitKey(0)
