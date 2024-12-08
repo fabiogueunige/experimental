@@ -16,7 +16,7 @@ def main():
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.5
+    angular = 0.0 #0.5
     bridge = CvBridge()
     img_pub = ImagePublisher()
 

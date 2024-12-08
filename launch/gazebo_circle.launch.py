@@ -30,6 +30,18 @@ def generate_launch_description():
         name='joint_state_publisher'
     )
 
+    arm_01_controller = Node(
+    package="controller_manager",
+    executable="spawner",
+    arguments=["joint_01_controller"]
+    )
+
+    broad = Node(
+    package="controller_manager",
+    executable="spawner",
+    arguments=["joint_broad"],
+    )
+
     aruco_node = Node(
         package='ros2_aruco',
         executable='aruco_node',
@@ -59,10 +71,11 @@ def generate_launch_description():
                                     description='Absolute path to robot urdf file'),
         robot_state_publisher_node,
         joint_state_publisher_node,
+        spawn_entity,
         aruco_node,
         main_node,
-        spawn_entity,
-        
+        arm_01_controller,
+        broad,
         ExecuteProcess(
             cmd=['gazebo', '--verbose', default_world_path, '-s', 'libgazebo_ros_factory.so'],
             output='screen'),
