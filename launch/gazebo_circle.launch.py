@@ -33,7 +33,7 @@ def generate_launch_description():
     arm_01_controller = Node(
     package="controller_manager",
     executable="spawner",
-    arguments=["joint_01_controller"]
+    arguments=["arm_joint_01"]
     )
 
     broad = Node(
@@ -53,10 +53,10 @@ def generate_launch_description():
         # output='screen'
     )
     
-    main_node = Node(
+    robot_rot_node = Node(
         package='robot_urdf',
-        executable='main',
-        name='main',
+        executable='robot_rot',
+        name='robot_rot',
         output='screen'
     )
 
@@ -72,10 +72,11 @@ def generate_launch_description():
         robot_state_publisher_node,
         joint_state_publisher_node,
         spawn_entity,
-        aruco_node,
-        main_node,
         arm_01_controller,
+        aruco_node,
+        robot_rot_node,
         broad,
+                
         ExecuteProcess(
             cmd=['gazebo', '--verbose', default_world_path, '-s', 'libgazebo_ros_factory.so'],
             output='screen'),

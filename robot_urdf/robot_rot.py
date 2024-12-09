@@ -1,13 +1,7 @@
 import rclpy
-from rclpy.node import Node
 from robot_urdf.marker_sub import MarkerClass_Subscriber
 from robot_urdf.cmd_pub import CmdPublisher
 from robot_urdf.image_pub import ImagePublisher
-from geometry_msgs.msg import Twist
-from ros2_aruco_interfaces.msg import ArucoMarkers
-from sensor_msgs.msg import CameraInfo
-from sensor_msgs.msg import Image
-import numpy as np
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -16,7 +10,7 @@ def main():
     vel_pub = CmdPublisher()
     marker = MarkerClass_Subscriber()
     linear = 0.0
-    angular = 0.0 #0.5
+    angular = 0.5 #0.5
     bridge = CvBridge()
     img_pub = ImagePublisher()
 
@@ -36,9 +30,6 @@ def main():
 
         marker.reorder()
         for mk in marker.detected_markers:
-            #if isinstance(mk['image'], Image):
-            #        marker.get_logger().info('Image received')
-                
             try: 
                 cv_image = bridge.imgmsg_to_cv2(mk['image'], desired_encoding='mono8')
             except CvBridgeError as e:
@@ -47,8 +38,6 @@ def main():
             center_x = int(mk['centers'].position.x)
             center_y = int(mk['centers'].position.y)
             radius = int(mk['centers'].position.z)
-            #center_x = int(mk['pose'].position.x)
-            #center_y = int(mk['pose'].position.y)
 
             cv2.circle(cv_image, (center_x, center_y), radius, (0, 255, 0), 2)
             

@@ -17,3 +17,14 @@ class ImagePublisher(Node):
         msg = img
         self.publisher_.publish(msg)
 
+def main():
+    rclpy.init()
+    node = ImagePublisher()
+    rclpy.spin(node)
+
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+

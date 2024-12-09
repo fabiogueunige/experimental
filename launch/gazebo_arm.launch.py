@@ -33,7 +33,7 @@ def generate_launch_description():
     arm_01_controller = Node(
     package="controller_manager",
     executable="spawner.py",
-    arguments=["joint_01_controller"]
+    arguments=["arm_joint_01"]
     )
     
     arm_02_controller = Node(

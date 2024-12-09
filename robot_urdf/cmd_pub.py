@@ -15,3 +15,15 @@ class CmdPublisher(Node):
         msg.linear.x = linear
         msg.angular.z = angular
         self.publisher_.publish(msg)
+
+def main():
+    rclpy.init()
+    node = CmdPublisher()
+    rclpy.spin(node)
+
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
